@@ -159,6 +159,89 @@ camera
 }
 
 animate();
+const logo =
+2
+document.getElementById("logo");
+3
+ 
+4
+function createPixel(){
+5
+ 
+6
+const pixel =
+7
+document.createElement("div");
+8
+ 
+9
+pixel.className = "pixel";
+10
+ 
+11
+const rect =
+12
+logo.getBoundingClientRect();
+13
+ 
+14
+pixel.style.left =
+15
+Math.random()*rect.width + "px";
+16
+ 
+17
+pixel.style.top =
+18
+Math.random()*rect.height + "px";
+19
+ 
+20
+logo.appendChild(pixel);
+21
+ 
+22
+setTimeout(()=>{
+23
+pixel.remove();
+24
+},1300);
+25
+ 
+26
+}
+27
+ 
+28
+setInterval(()=>{
+29
+ 
+30
+const amount =
+31
+Math.random()*6 + 2;
+32
+ 
+33
+for(let i=0;i<amount;i++){
+34
+ 
+35
+setTimeout(
+36
+createPixel,
+37
+Math.random()*400
+38
+);
+39
+ 
+40
+}
+41
+ 
+42
+},1200);
 
 window.addEventListener(
 'resize',
