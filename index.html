@@ -1,6 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HANØR</title>
 
 <style>
 
@@ -10,6 +13,8 @@ body{
     background:black;
     font-family:Arial,sans-serif;
 }
+
+/* CENTERED LOGOS */
 
 .logo-container{
 
@@ -39,17 +44,7 @@ body{
     line-height:0.85;
 }
 
-.logo:nth-child(1){
-    opacity:0.2;
-}
-
-.logo:nth-child(2){
-    opacity:1;
-}
-
-.logo:nth-child(3){
-    opacity:0.2;
-}
+/* FLASHING VOXELS */
 
 .voxel{
 
@@ -64,7 +59,6 @@ body{
 }
 
 </style>
-
 </head>
 
 <body>
@@ -89,22 +83,22 @@ function createVoxel(){
     voxel.className = "voxel";
 
     voxel.style.left =
-    (window.innerWidth/2 - 220 + Math.random()*440) + "px";
+    (window.innerWidth / 2 - 220 + Math.random() * 440) + "px";
 
     voxel.style.top =
-    (window.innerHeight/2 - 170 + Math.random()*340) + "px";
+    (window.innerHeight / 2 - 170 + Math.random() * 340) + "px";
 
     document.body.appendChild(voxel);
 
-    setTimeout(()=>{
+    setTimeout(() => {
 
         voxel.remove();
 
-    },300);
+    }, 300);
 
 }
 
-setInterval(createVoxel,150);
+setInterval(createVoxel, 150);
 
 </script>
 
