@@ -1,89 +1,19 @@
 <!DOCTYPE html>
 <html>
-<head>
+<body style="background:black;">
 
-<style>
-
-body{
-    background:black;
-    margin:0;
-    overflow:hidden;
-}
-
-.logo{
-
-    position:absolute;
-    top:50%;
-    left:50%;
-
-    transform:translate(-50%,-50%);
-
-    color:white;
-
-    font-size:100px;
-
-    font-family:Arial;
-
-}
-
-.voxel{
-
-    position:absolute;
-
-    width:80px;
-    height:80px;
-
-    background:white;
-
-    opacity:.9;
-}
-
-</style>
-
-</head>
-
-<body>
-
-<div class="logo">
-    HANØR
-</div>
-
-<voxels"></div>
+<h1 id="logo" style="color:white;font-size:100px;">
+HANØR
+</h1>
 
 <script>
 
-const layer =
-document.getElementById("voxels");
+setInterval(() => {
 
-function makeVoxel(){
+  document.getElementById("logo").style.color =
+    Math.random() > 0.5 ? "red" : "white";
 
-    const v =
-    document.createElement("div");
-
-    v.className =
-    "voxel";
-
-    v.style.left =
-    (window.innerWidth/2 - 200 + Math.random()*400)
-    + "px";
-
-    v.style.top =
-    (window.innerHeight/2 - 80 + Math.random()*120)
-    + "px";
-
-    layer.appendChild(v);
-
-    setTimeout(()=>{
-        v.remove();
-    },500);
-
-}
-
-setInterval(()=>{
-
-    makeVoxel();
-
-},200);
+}, 200);
 
 </script>
 
