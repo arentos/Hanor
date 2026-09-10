@@ -6,6 +6,7 @@
 <title>HANØR</title>
 
 <style>
+
 html,body{
     margin:0;
     width:100%;
@@ -27,8 +28,9 @@ html,body{
     color:white;
     font-size:6rem;
     letter-spacing:1rem;
-    font-weight:200;
     font-family:Arial,sans-serif;
+    font-weight:200;
+    z-index:10;
 }
 
 .pixel{
@@ -44,47 +46,49 @@ html,body{
 
     0%{
         opacity:0;
+        transform:scale(0);
     }
 
     50%{
         opacity:1;
+        transform:scale(1);
     }
 
     100%{
         opacity:0;
+        transform:scale(0);
     }
 
 }
+
 </style>
 </head>
 
 <body>
 
-<div class="logo">HANØR</div>
+<div class="logo" id="logo">HANØR</div>
 <div id="scene"></div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs8/three.min.jsscript>
+<script src="https://cdnjs.cloudflare.com/ajaxs/r128/three.min.jsscript>
 
 <script>
-
-// EVERYTHING GOES HERE
 
 const scene = new THREE.Scene();
 
 const camera = new THREE.PerspectiveCamera(
-75,
-window.innerWidth/window.innerHeight,
-0.1,
-1000
+    75,
+    window.innerWidth/window.innerHeight,
+    0.1,
+    1000
 );
 
 const renderer = new THREE.WebGLRenderer({
-antialias:true
+    antialias:true
 });
 
 renderer.setSize(
-window.innerWidth,
-window.innerHeight
+    window.innerWidth,
+    window.innerHeight
 );
 
 document
@@ -97,165 +101,126 @@ const cubes = [];
 
 for(let i=0;i<100;i++){
 
-const size = Math.random()*1.5+0.5;
+    const size = Math.random()*1.5+0.5;
 
-const geometry =
-new THREE.BoxGeometry(
-size,
-size,
-size
-);
+    const geometry =
+    new THREE.BoxGeometry(
+        size,
+        size,
+        size
+    );
 
-const material =
-new THREE.MeshBasicMaterial({
-color:0xffffff
-});
+    const material =
+    new THREE.MeshBasicMaterial({
+        color:0xffffff
+    });
 
-const cube =
-new THREE.Mesh(
-geometry,
-material
-);
+    const cube =
+    new THREE.Mesh(
+        geometry,
+        material
+    );
 
-cube.position.x =
-(Math.random()-0.5)*80;
+    cube.position.x =
+    (Math.random()-0.5)*80;
 
-cube.position.y =
-(Math.random()-0.5)*20;
+    cube.position.y =
+    (Math.random()-0.5)*20;
 
-cube.position.z =
-(Math.random()-0.5)*50;
+    cube.position.z =
+    (Math.random()-0.5)*50;
 
-cube.speed =
-Math.random()*0.02+0.01;
+    cube.speed =
+    Math.random()*0.02+0.01;
 
-scene.add(cube);
-
-cubes.push(cube);
+    cubes.push(cube);
+    scene.add(cube);
 }
 
 function animate(){
 
-requestAnimationFrame(animate);
+    requestAnimationFrame(animate);
 
-cubes.forEach(cube=>{
+    cubes.forEach(cube=>{
 
-cube.position.x -= cube.speed;
+        cube.position.x -= cube.speed;
 
-cube.rotation.x += 0.002;
-cube.rotation.y += 0.002;
+        cube.rotation.x += 0.002;
+        cube.rotation.y += 0.002;
 
-if(cube.position.x < -40){
-cube.position.x = 40;
-}
+        if(cube.position.x < -40){
+            cube.position.x = 40;
+        }
 
-});
+    });
 
-renderer.render(
-scene,
-camera
-);
-
+    renderer.render(
+        scene,
+        camera
+    );
 }
 
 animate();
+
+/* HANØR PIXELS */
+
 const logo =
-2
 document.getElementById("logo");
-3
- 
-4
+
 function createPixel(){
-5
- 
-6
-const pixel =
-7
-document.createElement("div");
-8
- 
-9
-pixel.className = "pixel";
-10
- 
-11
-const rect =
-12
-logo.getBoundingClientRect();
-13
- 
-14
-pixel.style.left =
-15
-Math.random()*rect.width + "px";
-16
- 
-17
-pixel.style.top =
-18
-Math.random()*rect.height + "px";
-19
- 
-20
-logo.appendChild(pixel);
-21
- 
-22
-setTimeout(()=>{
-23
-pixel.remove();
-24
-},1300);
-25
- 
-26
+
+    const pixel =
+    document.createElement("div");
+
+    pixel.className = "pixel";
+
+    const rect =
+    logo.getBoundingClientRect();
+
+    pixel.style.left =
+    Math.random()*rect.width + "px";
+
+    pixel.style.top =
+    Math.random()*rect.height + "px";
+
+    logo.appendChild(pixel);
+
+    setTimeout(()=>{
+        pixel.remove();
+    },1300);
 }
-27
- 
-28
+
 setInterval(()=>{
-29
- 
-30
-const amount =
-31
-Math.random()*6 + 2;
-32
- 
-33
-for(let i=0;i<amount;i++){
-34
- 
-35
-setTimeout(
-36
-createPixel,
-37
-Math.random()*400
-38
-);
-39
- 
-40
-}
-41
- 
-42
+
+    const amount =
+    Math.floor(Math.random()*5)+2;
+
+    for(let i=0;i<amount;i++){
+
+        setTimeout(
+            createPixel,
+            Math.random()*300
+        );
+
+    }
+
 },1200);
 
 window.addEventListener(
-'resize',
-()=>{
-camera.aspect =
-window.innerWidth/window.innerHeight;
+    'resize',
+    ()=>{
 
-camera.updateProjectionMatrix();
+        camera.aspect =
+        window.innerWidth/window.innerHeight;
 
-renderer.setSize(
-window.innerWidth,
-window.innerHeight
-);
-}
+        camera.updateProjectionMatrix();
+
+        renderer.setSize(
+            window.innerWidth,
+            window.innerHeight
+        );
+
+    }
 );
 
 </script>
