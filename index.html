@@ -13,7 +13,6 @@ html,body{
     height:100%;
     overflow:hidden;
     background:black;
-    font-family:Arial,sans-serif;
 }
 
 #scene{
@@ -26,39 +25,54 @@ html,body{
     top:50%;
     left:50%;
     transform:translate(-50%,-50%);
+
     color:white;
-    font-size:6rem;
-    letter-spacing:1rem;
-    font-weight:200;
+
+    font-size:9rem;
+    font-weight:900;
+
+    font-family:monospace;
+
+    letter-spacing:0.3rem;
+
     z-index:10;
+
+    text-rendering:pixelated;
+
+    animation:glitch 6s infinite;
 }
 
-.block{
-    position:absolute;
-    background:white;
-    opacity:0;
-    animation:blockPulse 1.5s ease forwards;
-}
-
-@keyframes blockPulse{
+@keyframes glitch{
 
     0%{
-        opacity:0;
-        transform:scaleY(0);
+        opacity:1;
     }
 
-    15%{
+    96%{
         opacity:1;
-        transform:scaleY(1);
     }
 
-    85%{
-        opacity:1;
+    97%{
+        transform:
+        translate(-50%,-50%)
+        translateX(-3px);
+    }
+
+    98%{
+        transform:
+        translate(-50%,-50%)
+        translateX(3px);
+    }
+
+    99%{
+        transform:
+        translate(-50%,-50%)
+        translateY(-2px);
     }
 
     100%{
-        opacity:0;
-        transform:scaleY(0);
+        transform:
+        translate(-50%,-50%);
     }
 
 }
@@ -68,16 +82,13 @@ html,body{
 
 <body>
 
-<div class="logo" id="logo">HANØR</div>
+<div class="logo">HANØR</div>
+
 <div id="scene"></div>
 
-<script src="https://cdnjs.cloudflare.com/ajaxs/r128/three.min.jsscript>
+<script src="https://cdnjs.cloudflare.com/ajax/libs//three.min.jsscript>
 
 <script>
-
-/* ==========================
-   THREEJS CUBES
-========================== */
 
 const scene = new THREE.Scene();
 
@@ -89,8 +100,7 @@ window.innerWidth/window.innerHeight,
 );
 
 const renderer = new THREE.WebGLRenderer({
-antialias:true,
-alpha:true
+antialias:true
 });
 
 renderer.setSize(
@@ -98,18 +108,17 @@ window.innerWidth,
 window.innerHeight
 );
 
-document
-.getElementById("scene")
+document.getElementById("scene")
 .appendChild(renderer.domElement);
 
 camera.position.z = 40;
 
 const cubes = [];
 
-for(let i=0;i<100;i++){
+for(let i=0;i<120;i++){
 
     const size =
-    Math.random()*1.5+0.5;
+    Math.random()*2 + 1;
 
     const geometry =
     new THREE.BoxGeometry(
@@ -130,18 +139,19 @@ for(let i=0;i<100;i++){
     );
 
     cube.position.x =
-    (Math.random()-0.5)*80;
+    (Math.random()-0.5)*120;
 
     cube.position.y =
-    (Math.random()-0.5)*20;
+    (Math.random()-0.5)*30;
 
     cube.position.z =
-    (Math.random()-0.5)*50;
+    (Math.random()-0.5)*60;
 
     cube.speed =
-    Math.random()*0.02+0.01;
+    Math.random()*0.03+0.01;
 
     cubes.push(cube);
+
     scene.add(cube);
 }
 
@@ -156,8 +166,10 @@ function animate(){
         cube.rotation.x += 0.002;
         cube.rotation.y += 0.002;
 
-        if(cube.position.x < -40){
-            cube.position.x = 40;
+        if(cube.position.x < -60){
+
+            cube.position.x = 60;
+
         }
 
     });
@@ -169,57 +181,6 @@ function animate(){
 }
 
 animate();
-
-/* ==========================
-   HANØR BLOCKS
-========================== */
-
-const logo =
-document.getElementById("logo");
-
-function createBlock(){
-
-    const block =
-    document.createElement("div");
-
-    block.className = "block";
-
-    const rect =
-    logo.getBoundingClientRect();
-
-    block.style.width = "18px";
-    block.style.height = "80px";
-
-    block.style.left =
-        Math.random() * (rect.width - 20) + "px";
-
-    block.style.top =
-        Math.random() * (rect.height - 80) + "px";
-
-    logo.appendChild(block);
-
-    setTimeout(()=>{
-        block.remove();
-    },1500);
-
-}
-
-setInterval(()=>{
-
-    for(let i=0;i<3;i++){
-
-        setTimeout(
-            createBlock,
-            i*200
-        );
-
-    }
-
-},2500);
-
-/* ==========================
-   RESIZE
-========================== */
 
 window.addEventListener(
 'resize',
