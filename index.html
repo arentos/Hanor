@@ -1,256 +1,89 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HANØR</title>
 
 <style>
 
-html,body{
+body{
+    background:black;
     margin:0;
-    width:100%;
-    height:100%;
     overflow:hidden;
-    background:#000;
-    font-family:Arial,sans-serif;
-}
-
-#scene{
-    position:fixed;
-    inset:0;
-}
-
-.logo-container{
-    position:absolute;
-    top:50%;
-    left:50%;
-    transform:translate(-50%,-50%);
-    z-index:10;
 }
 
 .logo{
-    font-size:7rem;
-    font-weight:200;
-    letter-spacing:1rem;
-    color:white;
-    position:relative;
-}
 
-#voxelLayer{
     position:absolute;
-    inset:0;
-    pointer-events:none;
+    top:50%;
+    left:50%;
+
+    transform:translate(-50%,-50%);
+
+    color:white;
+
+    font-size:100px;
+
+    font-family:Arial;
+
 }
 
 .voxel{
+
     position:absolute;
-    width:42px;
-    height:42px;
+
+    width:80px;
+    height:80px;
 
     background:white;
 
-    animation:voxelFlash 0.45s linear forwards;
-}
-
-@keyframes voxelFlash{
-
-    0%{
-        opacity:0;
-        transform:scale(0.8);
-    }
-
-    20%{
-        opacity:1;
-        transform:scale(1);
-    }
-
-    80%{
-        opacity:1;
-    }
-
-    100%{
-        opacity:0;
-        transform:scale(1.1);
-    }
-
+    opacity:.9;
 }
 
 </style>
+
 </head>
 
 <body>
 
-<div class="logo-container">
-
-    <div class="logo">
-        HANØR
-    </div>
-
-    <div id="voxelLayer"></div>
-
+<div class="logo">
+    HANØR
 </div>
 
-<div id="scene"></div>
-
-https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.jsscript>
+<voxels"></div>
 
 <script>
 
-const scene = new THREE.Scene();
+const layer =
+document.getElementById("voxels");
 
-const camera = new THREE.PerspectiveCamera(
-75,
-window.innerWidth/window.innerHeight,
-0.1,
-1000
-);
+function makeVoxel(){
 
-const renderer =
-new THREE.WebGLRenderer({
-antialias:true
-});
-
-renderer.setSize(
-window.innerWidth,
-window.innerHeight
-);
-
-document
-.getElementById("scene")
-.appendChild(renderer.domElement);
-
-camera.position.z = 40;
-
-const cubes = [];
-
-for(let i=0;i<120;i++){
-
-    const size =
-    Math.random()*2 + 0.5;
-
-    const geometry =
-    new THREE.BoxGeometry(
-        size,size,size
-    );
-
-    const material =
-    new THREE.MeshBasicMaterial({
-        color:0xffffff
-    });
-
-    const cube =
-    new THREE.Mesh(
-        geometry,
-        material
-    );
-
-    cube.position.x =
-    (Math.random()-0.5)*100;
-
-    cube.position.y =
-    (Math.random()-0.5)*40;
-
-    cube.position.z =
-    (Math.random()-0.5)*60;
-
-    cube.speed =
-    Math.random()*0.03 + 0.01;
-
-    cubes.push(cube);
-
-    scene.add(cube);
-}
-
-function animate(){
-
-    requestAnimationFrame(
-        animate
-    );
-
-    cubes.forEach(cube=>{
-
-        cube.position.x -= cube.speed;
-
-        cube.rotation.x += 0.002;
-        cube.rotation.y += 0.002;
-
-        if(cube.position.x < -60){
-
-            cube.position.x = 60;
-
-        }
-
-    });
-
-    renderer.render(
-        scene,
-        camera
-    );
-
-}
-
-animate();
-
-/* ==========================
-   VOXEL ANIMATION
-========================== */
-
-const voxelLayer =
-document.getElementById("voxelLayer");
-
-function spawnVoxel(){
-
-    const voxel =
+    const v =
     document.createElement("div");
 
-    voxel.className = "voxel";
+    v.className =
+    "voxel";
 
-    voxel.style.left =
-    Math.random()*500 + "px";
+    v.style.left =
+    (window.innerWidth/2 - 200 + Math.random()*400)
+    + "px";
 
-    voxel.style.top =
-    Math.random()*120 + "px";
+    v.style.top =
+    (window.innerHeight/2 - 80 + Math.random()*120)
+    + "px";
 
-    voxelLayer.appendChild(voxel);
+    layer.appendChild(v);
 
     setTimeout(()=>{
-        voxel.remove();
-    },450);
+        v.remove();
+    },500);
 
 }
-
-/* new blocks every 0.4s */
 
 setInterval(()=>{
 
-    const count =
-    Math.floor(Math.random()*5)+3;
+    makeVoxel();
 
-    for(let i=0;i<count;i++){
-
-        spawnVoxel();
-
-    }
-
-},400);
-
-window.addEventListener(
-'resize',
-()=>{
-
-camera.aspect =
-window.innerWidth/window.innerHeight;
-
-camera.updateProjectionMatrix();
-
-renderer.setSize(
-window.innerWidth,
-window.innerHeight
-);
-
-}
-);
+},200);
 
 </script>
 
