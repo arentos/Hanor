@@ -25,11 +25,35 @@ html,body{
     left:50%;
     transform:translate(-50%,-50%);
     color:white;
-    font-family:Arial,sans-serif;
     font-size:6rem;
     letter-spacing:1rem;
-    z-index:10;
-    pointer-events:none;
+    font-weight:200;
+    font-family:Arial,sans-serif;
+}
+
+.pixel{
+    position:absolute;
+    width:4px;
+    height:4px;
+    background:white;
+    opacity:0;
+    animation:blink 1.3s ease-out forwards;
+}
+
+@keyframes blink{
+
+    0%{
+        opacity:0;
+    }
+
+    50%{
+        opacity:1;
+    }
+
+    100%{
+        opacity:0;
+    }
+
 }
 </style>
 </head>
