@@ -13,6 +13,7 @@ html,body{
     height:100%;
     overflow:hidden;
     background:black;
+    font-family:Arial,sans-serif;
 }
 
 #scene{
@@ -28,35 +29,36 @@ html,body{
     color:white;
     font-size:6rem;
     letter-spacing:1rem;
-    font-family:Arial,sans-serif;
     font-weight:200;
     z-index:10;
 }
 
-.pixel{
+.block{
     position:absolute;
-    width:4px;
-    height:4px;
     background:white;
     opacity:0;
-    animation:blink 1.3s ease-out forwards;
+    animation:blockPulse 1.5s ease forwards;
 }
 
-@keyframes blink{
+@keyframes blockPulse{
 
     0%{
         opacity:0;
-        transform:scale(0);
+        transform:scaleY(0);
     }
 
-    50%{
+    15%{
         opacity:1;
-        transform:scale(1);
+        transform:scaleY(1);
+    }
+
+    85%{
+        opacity:1;
     }
 
     100%{
         opacity:0;
-        transform:scale(0);
+        transform:scaleY(0);
     }
 
 }
@@ -73,22 +75,27 @@ html,body{
 
 <script>
 
+/* ==========================
+   THREEJS CUBES
+========================== */
+
 const scene = new THREE.Scene();
 
 const camera = new THREE.PerspectiveCamera(
-    75,
-    window.innerWidth/window.innerHeight,
-    0.1,
-    1000
+75,
+window.innerWidth/window.innerHeight,
+0.1,
+1000
 );
 
 const renderer = new THREE.WebGLRenderer({
-    antialias:true
+antialias:true,
+alpha:true
 });
 
 renderer.setSize(
-    window.innerWidth,
-    window.innerHeight
+window.innerWidth,
+window.innerHeight
 );
 
 document
@@ -101,7 +108,8 @@ const cubes = [];
 
 for(let i=0;i<100;i++){
 
-    const size = Math.random()*1.5+0.5;
+    const size =
+    Math.random()*1.5+0.5;
 
     const geometry =
     new THREE.BoxGeometry(
@@ -162,65 +170,72 @@ function animate(){
 
 animate();
 
-/* HANØR PIXELS */
+/* ==========================
+   HANØR BLOCKS
+========================== */
 
 const logo =
 document.getElementById("logo");
 
-function createPixel(){
+function createBlock(){
 
-    const pixel =
+    const block =
     document.createElement("div");
 
-    pixel.className = "pixel";
+    block.className = "block";
 
     const rect =
     logo.getBoundingClientRect();
 
-    pixel.style.left =
-    Math.random()*rect.width + "px";
+    block.style.width = "18px";
+    block.style.height = "80px";
 
-    pixel.style.top =
-    Math.random()*rect.height + "px";
+    block.style.left =
+        Math.random() * (rect.width - 20) + "px";
 
-    logo.appendChild(pixel);
+    block.style.top =
+        Math.random() * (rect.height - 80) + "px";
+
+    logo.appendChild(block);
 
     setTimeout(()=>{
-        pixel.remove();
-    },1300);
+        block.remove();
+    },1500);
+
 }
 
 setInterval(()=>{
 
-    const amount =
-    Math.floor(Math.random()*5)+2;
-
-    for(let i=0;i<amount;i++){
+    for(let i=0;i<3;i++){
 
         setTimeout(
-            createPixel,
-            Math.random()*300
+            createBlock,
+            i*200
         );
 
     }
 
-},1200);
+},2500);
+
+/* ==========================
+   RESIZE
+========================== */
 
 window.addEventListener(
-    'resize',
-    ()=>{
+'resize',
+()=>{
 
-        camera.aspect =
-        window.innerWidth/window.innerHeight;
+camera.aspect =
+window.innerWidth/window.innerHeight;
 
-        camera.updateProjectionMatrix();
+camera.updateProjectionMatrix();
 
-        renderer.setSize(
-            window.innerWidth,
-            window.innerHeight
-        );
+renderer.setSize(
+window.innerWidth,
+window.innerHeight
+);
 
-    }
+}
 );
 
 </script>
