@@ -9,36 +9,65 @@
 
 html,body{
     margin:0;
-    overflow:hidden;
     width:100%;
     height:100%;
+    overflow:hidden;
     background:black;
     font-family:Arial,sans-serif;
 }
+
+/* PARTICLES */
 
 canvas{
     position:fixed;
     inset:0;
 }
 
+/* LOGO */
+
 .logo-container{
+
     position:absolute;
+
     top:50%;
     left:50%;
+
     transform:translate(-50%,-50%);
+
     display:flex;
     flex-direction:column;
     align-items:center;
+
     z-index:10;
+
     pointer-events:none;
 }
 
 .logo{
+
     color:white;
+
     font-size:110px;
+
     font-weight:200;
+
     line-height:0.82;
+
     letter-spacing:4px;
+}
+
+/* BLOCKS */
+
+.voxel{
+
+    position:absolute;
+
+    width:80px;
+    height:80px;
+
+    background:white;
+
+    z-index:20;
 }
 
 </style>
@@ -48,12 +77,20 @@ canvas{
 <canvas id="bg"></canvas>
 
 <div class="logo-container">
+
     <div class="logo">HANØR</div>
+
     <div class="logo">HANØR</div>
+
     <div class="logo">HANØR</div>
+
 </div>
 
 <script>
+
+/* ==========================
+   PARTICLES
+========================== */
 
 const canvas =
 document.getElementById("bg");
@@ -100,9 +137,10 @@ for(let i=0;i<2500;i++){
 
 }
 
-function animate(){
+function animateParticles(){
 
     ctx.fillStyle="black";
+
     ctx.fillRect(
         0,
         0,
@@ -145,12 +183,47 @@ function animate(){
     });
 
     requestAnimationFrame(
-        animate
+        animateParticles
     );
 
 }
 
-animate();
+animateParticles();
+
+/* ==========================
+   BIG BLOCKS
+========================== */
+
+function createVoxel(){
+
+    const voxel =
+    document.createElement("div");
+
+    voxel.className =
+    "voxel";
+
+    voxel.style.left =
+    (window.innerWidth/2 - 300 + Math.random()*600) + "px";
+
+    voxel.style.top =
+    (window.innerHeight/2 - 180 + Math.random()*360) + "px";
+
+    document.body.appendChild(voxel);
+
+    setTimeout(()=>{
+
+        voxel.remove();
+
+    },300);
+
+}
+
+/* fréquence */
+
+setInterval(
+    createVoxel,
+    150
+);
 
 </script>
 
