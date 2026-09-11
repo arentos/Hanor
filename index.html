@@ -7,7 +7,7 @@
 
 <style>
 
-html,body{
+html, body{
     margin:0;
     width:100%;
     height:100%;
@@ -16,17 +16,13 @@ html,body{
     font-family:Arial,sans-serif;
 }
 
-/* PARTICLES */
-
 canvas{
     position:fixed;
     inset:0;
+    z-index:1;
 }
 
-/* LOGO */
-
 .logo-container{
-
     position:absolute;
 
     top:50%;
@@ -36,27 +32,23 @@ canvas{
 
     display:flex;
     flex-direction:column;
+
     align-items:center;
 
-    z-index:10;
-
-    pointer-events:none;
+    z-index:5;
 }
 
 .logo{
-
     color:white;
 
-    font-size:110px;
+    font-size:100px;
 
     font-weight:200;
 
-    line-height:0.82;
-
-    letter-spacing:4px;
+    line-height:0.85;
 }
 
-/* BLOCKS */
+/* GROS BLOCS BLANCS */
 
 .voxel{
 
@@ -67,11 +59,12 @@ canvas{
 
     background:white;
 
-    z-index:20;
+    z-index:10;
 }
 
 </style>
 </head>
+
 <body>
 
 <canvas id="bg"></canvas>
@@ -88,9 +81,9 @@ canvas{
 
 <script>
 
-/* ==========================
-   PARTICLES
-========================== */
+/* =====================
+   PARTICULES
+===================== */
 
 const canvas =
 document.getElementById("bg");
@@ -110,8 +103,8 @@ function resize(){
 resize();
 
 window.addEventListener(
-"resize",
-resize
+    "resize",
+    resize
 );
 
 const particles = [];
@@ -131,13 +124,12 @@ for(let i=0;i<2500;i++){
         vy:(Math.random()-0.5)*0.15,
 
         opacity:
-        Math.random()*0.7+0.1
-
+        Math.random()*0.7 + 0.1
     });
 
 }
 
-function animateParticles(){
+function animate(){
 
     ctx.fillStyle="black";
 
@@ -153,17 +145,11 @@ function animateParticles(){
         p.x += p.vx;
         p.y += p.vy;
 
-        if(p.x < 0)
-        p.x = canvas.width;
+        if(p.x<0) p.x=canvas.width;
+        if(p.x>canvas.width) p.x=0;
 
-        if(p.x > canvas.width)
-        p.x = 0;
-
-        if(p.y < 0)
-        p.y = canvas.height;
-
-        if(p.y > canvas.height)
-        p.y = 0;
+        if(p.y<0) p.y=canvas.height;
+        if(p.y>canvas.height) p.y=0;
 
         ctx.fillStyle =
         `rgba(255,255,255,${p.opacity})`;
@@ -183,16 +169,15 @@ function animateParticles(){
     });
 
     requestAnimationFrame(
-        animateParticles
+        animate
     );
-
 }
 
-animateParticles();
+animate();
 
-/* ==========================
-   BIG BLOCKS
-========================== */
+/* =====================
+   GROS BLOCS
+===================== */
 
 function createVoxel(){
 
@@ -203,12 +188,14 @@ function createVoxel(){
     "voxel";
 
     voxel.style.left =
-    (window.innerWidth/2 - 300 + Math.random()*600) + "px";
+    (window.innerWidth / 2 - 220 + Math.random()*440) + "px";
 
     voxel.style.top =
-    (window.innerHeight/2 - 180 + Math.random()*360) + "px";
+    (window.innerHeight / 2 - 170 + Math.random()*340) + "px";
 
-    document.body.appendChild(voxel);
+    document.body.appendChild(
+        voxel
+    );
 
     setTimeout(()=>{
 
@@ -217,8 +204,6 @@ function createVoxel(){
     },300);
 
 }
-
-/* fréquence */
 
 setInterval(
     createVoxel,
