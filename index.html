@@ -147,10 +147,28 @@ body{
 ===================================================== */
 
 .soundcloud-link{
+
     position:fixed;
 
-    top:28px;
-    right:30px;
+    left:50%;
+    top:calc(50% + 170px);
+
+    transform:translateX(-50%);
+
+    display:flex;
+    align-items:center;
+
+    gap:12px;
+
+    color:white;
+
+    text-decoration:none;
+
+    z-index:1000;
+
+    opacity:0.85;
+
+    transition:all .3s ease;
 
     display:flex;
     align-items:center;
