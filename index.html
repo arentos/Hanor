@@ -1,183 +1,776 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>HANØR</title>
 
 <style>
 
-html, body{
+*{
+    box-sizing:border-box;
+}
+
+html,
+body{
     margin:0;
     width:100%;
     height:100%;
     overflow:hidden;
-    background:black;
-    font-family:Arial,sans-serif;
+    background:#000;
+    font-family:Arial, Helvetica, sans-serif;
+    cursor:crosshair;
 }
 
-canvas{
+/* =========================
+   FOND DE PARTICULES
+========================= */
+
+#particleCanvas{
     position:fixed;
-    inset:0;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
     z-index:1;
+    display:block;
 }
+
+/* =========================
+   LOGOS HANØR
+========================= */
 
 .logo-container{
     position:absolute;
-
     top:50%;
     left:50%;
 
-    transform:translate(-50%,-50%);
+    transform:translate(-50%, -50%);
 
     display:flex;
     flex-direction:column;
-
     align-items:center;
 
     z-index:5;
+
+    pointer-events:none;
+    user-select:none;
 }
 
 .logo{
-    color:white;
+    color:#fff;
 
     font-size:100px;
-
     font-weight:200;
-
     line-height:0.85;
+    letter-spacing:0;
+
+    white-space:nowrap;
 }
 
-/* GROS BLOCS BLANCS */
+/* =========================
+   GROS BLOCS BLANCS
+========================= */
 
 .voxel{
-
-    position:absolute;
+    position:fixed;
 
     width:80px;
     height:80px;
 
-    background:white;
+    background:#fff;
 
     z-index:10;
+
+    pointer-events:none;
+
+    animation:voxelAnimation 300ms linear forwards;
+}
+
+@keyframes voxelAnimation{
+
+    0%{
+        opacity:0;
+        transform:scale(0.9);
+    }
+
+    12%{
+        opacity:1;
+        transform:scale(1);
+    }
+
+    82%{
+        opacity:1;
+        transform:scale(1);
+    }
+
+    100%{
+        opacity:0;
+        transform:scale(1);
+    }
+}
+
+/* =========================
+   VERSION MOBILE
+========================= */
+
+@media screen and (max-width:700px){
+
+    .logo{
+        font-size:18vw;
+        line-height:0.86;
+    }
+
+    .voxel{
+        width:55px;
+        height:55px;
+    }
 }
 
 </style>
+
 </head>
 
 <body>
 
-<canvas id="bg"></canvas>
+<canvas id="particleCanvas"></canvas>
 
 <div class="logo-container">
 
     <div class="logo">HANØR</div>
-
     <div class="logo">HANØR</div>
-
     <div class="logo">HANØR</div>
 
 </div>
 
 <script>
 
-/* =====================
-   PARTICULES
-===================== */
+/* =====================================================
+   CONFIGURATION
+===================================================== */
+
+const PARTICLE_COUNT_DESKTOP = 1800;
+const PARTICLE_COUNT_MOBILE = 800;
+
+const MOUSE_RADIUS = 320;
+const MOUSE_FORCE = 0.0018;
+
+const PARTICLE_MIN_SIZE = 0.35;
+const PARTICLE_MAX_SIZE = 2.6;
+
+const VOXEL_INTERVAL = 150;
+const VOXEL_LIFETIME = 300;
+
+
+/* =====================================================
+   CANVAS
+===================================================== */
 
 const canvas =
-document.getElementById("bg");
+document.getElementById("particleCanvas");
 
 const ctx =
 canvas.getContext("2d");
 
-function resize(){
+let width =
+window.innerWidth;
 
-    canvas.width =
-    window.innerWidth;
+let height =
+window.innerHeight;
 
-    canvas.height =
-    window.innerHeight;
+let centerX =
+width / 2;
+
+let centerY =
+height / 2;
+
+let devicePixelRatioValue =
+Math.min(window.devicePixelRatio || 1, 2);
+
+
+/* =====================================================
+   SOURIS
+===================================================== */
+
+const mouse = {
+
+    x:centerX,
+    y:centerY,
+
+    targetX:centerX,
+    targetY:centerY,
+
+    active:false
+};
+
+
+/* =====================================================
+   PARTICULES
+===================================================== */
+
+let particles = [];
+
+function getParticleCount(){
+
+    if(window.innerWidth < 700){
+
+        return PARTICLE_COUNT_MOBILE;
+    }
+
+    return PARTICLE_COUNT_DESKTOP;
 }
 
-resize();
 
-window.addEventListener(
-    "resize",
-    resize
-);
+/* =====================================================
+   CRÉATION D'UNE PARTICULE 3D
+===================================================== */
 
-const particles = [];
+function createParticle(){
 
-for(let i=0;i<2500;i++){
+    const depth =
+    Math.random();
 
-    particles.push({
+    return {
 
-        x:Math.random()*window.innerWidth,
+        x:(Math.random() - 0.5) * width * 1.7,
 
-        y:Math.random()*window.innerHeight,
+        y:(Math.random() - 0.5) * height * 1.7,
 
-        size:Math.random()*2,
+        z:120 + Math.random() * 1100,
 
-        vx:(Math.random()-0.5)*0.15,
+        baseZ:120 + Math.random() * 1100,
 
-        vy:(Math.random()-0.5)*0.15,
+        velocityX:
+        (Math.random() - 0.5) * 0.08,
+
+        velocityY:
+        (Math.random() - 0.5) * 0.08,
+
+        velocityZ:
+        0.15 + Math.random() * 0.45,
+
+        driftX:
+        (Math.random() - 0.5) * 0.012,
+
+        driftY:
+        (Math.random() - 0.5) * 0.012,
+
+        size:
+        PARTICLE_MIN_SIZE +
+        Math.random() *
+        (PARTICLE_MAX_SIZE - PARTICLE_MIN_SIZE),
 
         opacity:
-        Math.random()*0.7 + 0.1
-    });
+        0.18 + Math.random() * 0.82,
 
+        phase:
+        Math.random() * Math.PI * 2,
+
+        depth:depth
+    };
 }
 
-function animate(){
 
-    ctx.fillStyle="black";
+/* =====================================================
+   INITIALISATION
+===================================================== */
+
+function createParticles(){
+
+    particles = [];
+
+    const amount =
+    getParticleCount();
+
+    for(let i = 0; i < amount; i++){
+
+        particles.push(
+            createParticle()
+        );
+    }
+}
+
+
+/* =====================================================
+   REDIMENSIONNEMENT
+===================================================== */
+
+function resizeCanvas(){
+
+    width =
+    window.innerWidth;
+
+    height =
+    window.innerHeight;
+
+    centerX =
+    width / 2;
+
+    centerY =
+    height / 2;
+
+    devicePixelRatioValue =
+    Math.min(
+        window.devicePixelRatio || 1,
+        2
+    );
+
+    canvas.width =
+    width * devicePixelRatioValue;
+
+    canvas.height =
+    height * devicePixelRatioValue;
+
+    canvas.style.width =
+    width + "px";
+
+    canvas.style.height =
+    height + "px";
+
+    ctx.setTransform(
+        devicePixelRatioValue,
+        0,
+        0,
+        devicePixelRatioValue,
+        0,
+        0
+    );
+
+    if(!mouse.active){
+
+        mouse.x =
+        centerX;
+
+        mouse.y =
+        centerY;
+
+        mouse.targetX =
+        centerX;
+
+        mouse.targetY =
+        centerY;
+    }
+
+    createParticles();
+}
+
+
+/* =====================================================
+   MOUVEMENT DE LA SOURIS
+===================================================== */
+
+window.addEventListener(
+    "mousemove",
+    function(event){
+
+        mouse.targetX =
+        event.clientX;
+
+        mouse.targetY =
+        event.clientY;
+
+        mouse.active =
+        true;
+    }
+);
+
+
+/* =====================================================
+   SORTIE DE LA SOURIS
+===================================================== */
+
+document.addEventListener(
+    "mouseleave",
+    function(){
+
+        mouse.active =
+        false;
+
+        mouse.targetX =
+        centerX;
+
+        mouse.targetY =
+        centerY;
+    }
+);
+
+
+/* =====================================================
+   SUPPORT TACTILE
+===================================================== */
+
+window.addEventListener(
+    "touchmove",
+    function(event){
+
+        if(event.touches.length > 0){
+
+            mouse.targetX =
+            event.touches[0].clientX;
+
+            mouse.targetY =
+            event.touches[0].clientY;
+
+            mouse.active =
+            true;
+        }
+
+    },
+    {
+        passive:true
+    }
+);
+
+window.addEventListener(
+    "touchend",
+    function(){
+
+        mouse.active =
+        false;
+
+        mouse.targetX =
+        centerX;
+
+        mouse.targetY =
+        centerY;
+    }
+);
+
+
+/* =====================================================
+   REMISE EN PLACE D'UNE PARTICULE
+===================================================== */
+
+function resetParticle(
+    particle,
+    randomDepth
+){
+
+    particle.x =
+    (Math.random() - 0.5) *
+    width *
+    1.7;
+
+    particle.y =
+    (Math.random() - 0.5) *
+    height *
+    1.7;
+
+    particle.z =
+    randomDepth
+    ? 120 + Math.random() * 1100
+    : 1150;
+
+    particle.velocityX =
+    (Math.random() - 0.5) * 0.08;
+
+    particle.velocityY =
+    (Math.random() - 0.5) * 0.08;
+
+    particle.velocityZ =
+    0.15 + Math.random() * 0.45;
+}
+
+
+/* =====================================================
+   ANIMATION 3D DES PARTICULES
+===================================================== */
+
+function animateParticles(time){
+
+    ctx.fillStyle =
+    "#000";
 
     ctx.fillRect(
         0,
         0,
-        canvas.width,
-        canvas.height
+        width,
+        height
     );
 
-    particles.forEach(p=>{
+    /*
+    La souris se déplace doucement vers
+    sa nouvelle position afin d'éviter
+    les mouvements brusques.
+    */
 
-        p.x += p.vx;
-        p.y += p.vy;
+    mouse.x +=
+    (mouse.targetX - mouse.x) * 0.09;
 
-        if(p.x<0) p.x=canvas.width;
-        if(p.x>canvas.width) p.x=0;
+    mouse.y +=
+    (mouse.targetY - mouse.y) * 0.09;
 
-        if(p.y<0) p.y=canvas.height;
-        if(p.y>canvas.height) p.y=0;
+    for(let i = 0; i < particles.length; i++){
+
+        const particle =
+        particles[i];
+
+        /*
+        Les particules avancent vers
+        la caméra afin de créer un effet 3D.
+        */
+
+        particle.z -=
+        particle.velocityZ;
+
+        /*
+        Mouvement organique permanent.
+        */
+
+        particle.velocityX +=
+        Math.sin(
+            time * 0.00022 +
+            particle.phase
+        ) * particle.driftX;
+
+        particle.velocityY +=
+        Math.cos(
+            time * 0.00018 +
+            particle.phase
+        ) * particle.driftY;
+
+        particle.x +=
+        particle.velocityX;
+
+        particle.y +=
+        particle.velocityY;
+
+        /*
+        Projection de la position 3D
+        sur l'écran 2D.
+        */
+
+        const perspective =
+        420 / particle.z;
+
+        let screenX =
+        centerX +
+        particle.x *
+        perspective;
+
+        let screenY =
+        centerY +
+        particle.y *
+        perspective;
+
+        /*
+        Distance entre la particule
+        et le curseur.
+        */
+
+        const differenceX =
+        mouse.x - screenX;
+
+        const differenceY =
+        mouse.y - screenY;
+
+        const distance =
+        Math.sqrt(
+            differenceX * differenceX +
+            differenceY * differenceY
+        );
+
+        /*
+        Attraction vers le curseur.
+        Les points proches du curseur
+        sont davantage attirés.
+        */
+
+        if(
+            mouse.active &&
+            distance < MOUSE_RADIUS &&
+            distance > 1
+        ){
+
+            const attraction =
+            1 -
+            distance /
+            MOUSE_RADIUS;
+
+            particle.velocityX +=
+            differenceX *
+            MOUSE_FORCE *
+            attraction /
+            Math.max(perspective, 0.35);
+
+            particle.velocityY +=
+            differenceY *
+            MOUSE_FORCE *
+            attraction /
+            Math.max(perspective, 0.35);
+
+            /*
+            Les particules attirées avancent
+            légèrement vers la caméra.
+            */
+
+            particle.z -=
+            attraction * 1.8;
+        }
+
+        /*
+        Limitation de la vitesse pour
+        conserver un mouvement fluide.
+        */
+
+        const maximumSpeed =
+        2.2;
+
+        particle.velocityX =
+        Math.max(
+            -maximumSpeed,
+            Math.min(
+                maximumSpeed,
+                particle.velocityX
+            )
+        );
+
+        particle.velocityY =
+        Math.max(
+            -maximumSpeed,
+            Math.min(
+                maximumSpeed,
+                particle.velocityY
+            )
+        );
+
+        /*
+        Une légère friction ralentit
+        progressivement la particule.
+        */
+
+        particle.velocityX *=
+        0.992;
+
+        particle.velocityY *=
+        0.992;
+
+        /*
+        Recalcul après l'attraction.
+        */
+
+        const finalPerspective =
+        420 / particle.z;
+
+        screenX =
+        centerX +
+        particle.x *
+        finalPerspective;
+
+        screenY =
+        centerY +
+        particle.y *
+        finalPerspective;
+
+        /*
+        Les particules proches de la caméra
+        paraissent plus grandes et lumineuses.
+        */
+
+        const depthScale =
+        Math.max(
+            0.15,
+            Math.min(
+                3.2,
+                finalPerspective * 2.5
+            )
+        );
+
+        const renderedSize =
+        particle.size *
+        depthScale;
+
+        const depthOpacity =
+        Math.max(
+            0.08,
+            Math.min(
+                1,
+                1.25 -
+                particle.z / 1250
+            )
+        );
+
+        const renderedOpacity =
+        particle.opacity *
+        depthOpacity;
 
         ctx.fillStyle =
-        `rgba(255,255,255,${p.opacity})`;
+        "rgba(255,255,255," +
+        renderedOpacity +
+        ")";
 
         ctx.beginPath();
 
         ctx.arc(
-            p.x,
-            p.y,
-            p.size,
+            screenX,
+            screenY,
+            renderedSize,
             0,
-            Math.PI*2
+            Math.PI * 2
         );
 
         ctx.fill();
 
-    });
+        /*
+        Léger halo sur les particules
+        très proches de la caméra.
+        */
+
+        if(
+            particle.z < 240 &&
+            renderedSize > 1.5
+        ){
+
+            ctx.fillStyle =
+            "rgba(255,255,255," +
+            renderedOpacity * 0.13 +
+            ")";
+
+            ctx.beginPath();
+
+            ctx.arc(
+                screenX,
+                screenY,
+                renderedSize * 2.8,
+                0,
+                Math.PI * 2
+            );
+
+            ctx.fill();
+        }
+
+        /*
+        Réapparition au fond lorsque
+        la particule dépasse la caméra
+        ou sort trop loin de l'écran.
+        */
+
+        if(
+            particle.z < 55 ||
+            screenX < -150 ||
+            screenX > width + 150 ||
+            screenY < -150 ||
+            screenY > height + 150
+        ){
+
+            resetParticle(
+                particle,
+                false
+            );
+        }
+    }
 
     requestAnimationFrame(
-        animate
+        animateParticles
     );
 }
 
-animate();
 
-/* =====================
-   GROS BLOCS
-===================== */
+/* =====================================================
+   GROS BLOCS BLANCS ORIGINAUX
+===================================================== */
 
 function createVoxel(){
 
@@ -187,27 +780,58 @@ function createVoxel(){
     voxel.className =
     "voxel";
 
+    /*
+    Les blocs apparaissent dans exactement
+    la même zone centrale qu'avant.
+    */
+
     voxel.style.left =
-    (window.innerWidth / 2 - 220 + Math.random()*440) + "px";
+    (
+        window.innerWidth / 2 -
+        220 +
+        Math.random() * 440
+    ) + "px";
 
     voxel.style.top =
-    (window.innerHeight / 2 - 170 + Math.random()*340) + "px";
+    (
+        window.innerHeight / 2 -
+        170 +
+        Math.random() * 340
+    ) + "px";
 
     document.body.appendChild(
         voxel
     );
 
-    setTimeout(()=>{
+    setTimeout(
+        function(){
 
-        voxel.remove();
+            voxel.remove();
 
-    },300);
-
+        },
+        VOXEL_LIFETIME
+    );
 }
+
+
+/* =====================================================
+   LANCEMENT
+===================================================== */
+
+resizeCanvas();
+
+requestAnimationFrame(
+    animateParticles
+);
 
 setInterval(
     createVoxel,
-    150
+    VOXEL_INTERVAL
+);
+
+window.addEventListener(
+    "resize",
+    resizeCanvas
 );
 
 </script>
